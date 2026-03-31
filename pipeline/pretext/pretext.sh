@@ -15,5 +15,5 @@ fi
 out=${bam/.bam/.pretext}
 
 echo "\
-samtools view -h $bam | $tools/Pretext/PretextMap -o $out"
-samtools view -h $bam | $tools/Pretext/PretextMap -o $out
+samtools view -h $bam | $tools/Pretext/PretextMap --mapq 0 -o $out"
+samtools view -h $bam | $tools/Pretext/PretextMap --mapq 0 -o $out
