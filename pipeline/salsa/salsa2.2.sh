@@ -31,4 +31,4 @@ echo "\
 python $tools/salsa2/SALSA-2.2/run_pipeline.py -a $fasta -l $fasta.fai -e $enz -b $bed -o $out -m yes -p yes"
 python $tools/salsa2/SALSA-2.2/run_pipeline.py -a $fasta -l $fasta.fai -e $enz -b $bed -o $out -m yes -p yes
 
-ln -s $out/scaffolds_FINAL.fasta ${fasta/_s2/_s3}
+ln -s $out/scaffolds_FINAL.fasta ${fasta%.*}_salsa.fasta

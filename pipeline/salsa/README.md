@@ -9,7 +9,7 @@
 ### Salsa2 on a conda environment
 Download [Salsa2.2](https://github.com/machinegun/SALSA/releases/tag/v2.2) in your $tools/salsa path
 
-```
+```sh
 cd $tools
 mkdir salsa2
 wget https://github.com/machinegun/SALSA/archive/v2.2.tar.gz
@@ -18,7 +18,7 @@ tar -zxf v2.2.tar.gz
 
 Build python environment: This needs to be done only once
 
-```
+```sh
 mkdir -p $tools/conda/temp
 cd $tools/conda/temp
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -29,21 +29,21 @@ conda create -n salsa_env python=2.7.15 networkx==1.11
 ```
 
 Test if salsa is working
-```
+```sh
 source $tools/conda/etc/profile.d/conda.sh
 conda activate salsa_env
 python $tools/salsa2/SALSA-2.2/run_pipeline.py -h
 ```
 
 ## Workflow
-```
+```sh
 Usage: ./_submit_salsa_2.2.sh <fasta> [jobid]
 ```
 
 ### Input
 * `fastq.map` : R1.fastq.gz <tab> R2.fastq.gz in one line. Concatenate before running.
 * `asm.fasta` : Reference to align. Symlink in the directory where this script is running.
-* `re_bases.txt` : Restriction enzyme site bases.
+* `re_bases.txt` : Restriction enzyme site bases. Only for Salsa if applicable. Optional.
 
 ### BWA Indexing
 The first step generates bwa index of the `asm.fasta`.
@@ -53,11 +53,19 @@ index.sh $asm.fasta
 
 ### Arima mapping pipeline
 This code is a slightly modified version of the [ArimaGenomics mapping_pipeline](https://github.com/ArimaGenomics/mapping_pipeline).
-```
-arima_mapping_pipeline.sh fastq.map out_prefix $asm.fasta tmp [bwa_opts]
+
+* Updated to v0.3 on Mar 31, 2026. The updated version supports better control of the MQ. Before, any alignment with MQ < 10 were removed. Now MQ0 is set as default.
+* For best practices, remove the 5 bps of the beginning of the input fastq.gz in case you are running the Arima Hi-C library prep kit.
+
+```sh
+zcat input.fastq.gz | awk '{ if (NR%2 == 0) {print substr($1, 6)} else {print}}' | bgzip -@$cpus > output.fastq.gz
 ```
 
-I have commented the last dedup step. Uncomment if you prefer to do the deduplication, run with picard tools.
+```sh
+arima_mapping_pipeline.sh fastq.map out_prefix $asm.fasta [temp=/lscratch/$SLURM_JOBID] [MAPQ_FILTER=0]
+```
+
+* The last RG tag adding step is not included in the updated version. The dedup step is commented out. Uncomment if you prefer to do the deduplication, with picard tools following the [ArimaGenomics guildeline](https://github.com/ArimaGenomics/mapping_pipeline).
 
 ### Salsa 2.2
 Convert the bam to bed and finally do the scaffolding

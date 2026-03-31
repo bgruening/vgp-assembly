@@ -8,8 +8,8 @@ MAIN : {
         die ("Usage: ./two_read_bam_combiner.pl <read 1 bam> <read 2 bam> <path to samtools> <minimum map quality filter>\n");
     }
 
-    open(FILE1, "$samtools view -h $read1_bam |");
-    open(FILE2, "$samtools view -h $read2_bam |");
+    open(FILE1, "$samtools view -@4 -h $read1_bam |");
+    open(FILE2, "$samtools view -@4 -h $read2_bam |");
 
     my $line1 = <FILE1>;
     my $line2 = <FILE2>;
