@@ -29,7 +29,7 @@ cpus=4
 mem=24g
 name=$out_prefix.index
 log=logs/${name}.%A.log
-script=$VGP_PIPELINE/salsa/index.sh
+script=$VGP_PIPELINE/bwa/bwa_index.sh
 partition=norm
 extra=""
 walltime=1-0
@@ -41,7 +41,7 @@ echo "Run Arima mapping pipeline against $ref"
 
 if ! [ -z $jobid ] ; then
 	    extra="--dependency=afterok:$jobid"
-elif [ ! -e $ref.fai ]; then
+elif [ ! -e $ref.bwt ]; then
 	echo "\
 	sbatch -J $name --mem=$mem --partition=$partition --cpus-per-task=$cpus -D $path $extra --time=$walltime --error=$log --output=$log $script $args"
 	sbatch -J $name --mem=$mem --partition=$partition --cpus-per-task=$cpus -D $path $extra --time=$walltime --error=$log --output=$log $script $args > index_jid
@@ -52,8 +52,8 @@ fi
 cpus=48
 mem=40g
 name=$out_prefix.map
-walltime=1-0 # 3-0
-gres="--gres=lscratch:100" # 600 for 600GB - for regular 50x HiC
+walltime=3-0 # 3-0
+gres="--gres=lscratch:600" # 600 for 600GB - for regular 50x HiC
 log=logs/${name}.%A.log
 script=$VGP_PIPELINE/salsa/arima_mapping_pipeline.sh
 args="$fastq_map $out_prefix $ref"
